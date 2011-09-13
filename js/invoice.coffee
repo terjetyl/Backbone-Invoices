@@ -38,7 +38,7 @@ class window.Invoices extends Backbone.Collection
   model: Invoice 
   localStorage: new Store("invoices")
 
-window.Invoices = new Invoices
+window.invoices = new Invoices
     
     
 # ------------------------------------------------------
@@ -84,7 +84,7 @@ class window.InvoiceForm extends Backbone.View
       seller_info : @$("textarea[name='seller_info']").val()
     }
     if @model.isNew()
-      Invoices.create(data)
+      invoices.create(data)
     else
       @model.save(data)
     e.preventDefault()
@@ -115,7 +115,8 @@ class window.LineItemView extends Backbone.View
     $(@.el).html(rendered_content)
     @
   removeRow: (e) ->
-    @model.destroy()
+    $(@.el).fadeOut 'slow', ->
+      $(@el).remove()   
 
 
 # ------------------------------------------------------
@@ -131,7 +132,7 @@ class window.App extends Backbone.Router
   initialize: ->
     
   index: ->  
-    @invoiceIndex = new InvoiceIndex({collection: Invoices})
+    @invoiceIndex = new InvoiceIndex({collection: invoices})
     @invoiceIndex.render()
   
   newInvoice: -> 
@@ -139,7 +140,7 @@ class window.App extends Backbone.Router
     @newInvoiceForm.render()
   
   edit: (id) ->
-    inv = Invoices.getByCid(id)
+    inv = invoices.getByCid(id)
     @newInvoiceForm = new InvoiceForm({model: inv})
     @newInvoiceForm.render()
       

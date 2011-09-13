@@ -47,7 +47,7 @@
     Invoices.prototype.localStorage = new Store("invoices");
     return Invoices;
   })();
-  window.Invoices = new Invoices;
+  window.invoices = new Invoices;
   window.InvoiceIndex = (function() {
     __extends(InvoiceIndex, Backbone.View);
     function InvoiceIndex() {
@@ -107,7 +107,7 @@
         seller_info: this.$("textarea[name='seller_info']").val()
       };
       if (this.model.isNew()) {
-        Invoices.create(data);
+        invoices.create(data);
       } else {
         this.model.save(data);
       }
@@ -146,7 +146,9 @@
       return this;
     };
     LineItemView.prototype.removeRow = function(e) {
-      return this.model.destroy();
+      return $(this.el).fadeOut('slow', function() {
+        return $(this.el).remove();
+      });
     };
     return LineItemView;
   })();
@@ -163,7 +165,7 @@
     App.prototype.initialize = function() {};
     App.prototype.index = function() {
       this.invoiceIndex = new InvoiceIndex({
-        collection: Invoices
+        collection: invoices
       });
       return this.invoiceIndex.render();
     };
@@ -175,7 +177,7 @@
     };
     App.prototype.edit = function(id) {
       var inv;
-      inv = Invoices.getByCid(id);
+      inv = invoices.getByCid(id);
       this.newInvoiceForm = new InvoiceForm({
         model: inv
       });

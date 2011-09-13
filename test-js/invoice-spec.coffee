@@ -11,14 +11,16 @@ describe "Invoice", ->
   it "should provide formatted date while calling formattedDate()", ->
     @f2 = new Invoice({date:new Date('2011-09-03')})
     expect(@f2.formattedDate()).toBe '03/09/2011'
-  it "should have one default line item on createion", ->
-    expect(@f.get('line_items').length).toBe 1  
     
-#window.InvoicesTest = class InvoicesTest extends Invoices    
-#  localStorage: new Store("invoices-test")
+  describe 'newly created line items array', ->  
+    it "should be size of 1", ->
+      expect(@f.get('line_items').length).toBe 1  
+    it "with the length of 1 should have item price = 100.00 and quantity = 1", ->
+      expect(@f.get('line_items')[0].get('price')).toBe 100.00
+      expect(@f.get('line_items')[0].get('quantity')).toBe 1
+    
 
-class window.InvoicesDouble extends Backbone.Collection
-  model: Invoice 
+class window.InvoicesDouble extends Invoices
   localStorage: new Store("invoices-test")
 
 window.invoices_test = new InvoicesDouble

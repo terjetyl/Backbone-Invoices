@@ -25,16 +25,21 @@
       });
       return expect(this.f2.formattedDate()).toBe('03/09/2011');
     });
-    return it("should have one default line item on createion", function() {
-      return expect(this.f.get('line_items').length).toBe(1);
+    return describe('newly created line items array', function() {
+      it("should be size of 1", function() {
+        return expect(this.f.get('line_items').length).toBe(1);
+      });
+      return it("with the length of 1 should have item price = 100.00 and quantity = 1", function() {
+        expect(this.f.get('line_items')[0].get('price')).toBe(100.00);
+        return expect(this.f.get('line_items')[0].get('quantity')).toBe(1);
+      });
     });
   });
   window.InvoicesDouble = (function() {
-    __extends(InvoicesDouble, Backbone.Collection);
+    __extends(InvoicesDouble, Invoices);
     function InvoicesDouble() {
       InvoicesDouble.__super__.constructor.apply(this, arguments);
     }
-    InvoicesDouble.prototype.model = Invoice;
     InvoicesDouble.prototype.localStorage = new Store("invoices-test");
     return InvoicesDouble;
   })();
