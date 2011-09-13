@@ -12,14 +12,36 @@
     function LineItem() {
       LineItem.__super__.constructor.apply(this, arguments);
     }
-    LineItem.prototype.initialize = function() {};
+    LineItem.prototype.tax_rates = {
+      0: "0%",
+      0.19: "19%",
+      0.22: "22%",
+      0.23: "23%"
+    };
+    LineItem.prototype.initialize = function() {
+      var name, rate, _ref, _results;
+      this.tax_rates_option_tag = "";
+      _ref = this.tax_rates;
+      _results = [];
+      for (rate in _ref) {
+        name = _ref[rate];
+        _results.push(this.tax_rates_option_tag += '<option value="' + rate + '">' + name + '</option>');
+      }
+      return _results;
+    };
+    LineItem.prototype.getTaxRatesOptionTag = function() {
+      return this.tax_rates_option_tag;
+    };
     LineItem.prototype.getTotalPrice = function() {
-      return this.get('quantity') * this.get('price');
+      var total_price;
+      total_price = this.get('price') * this.get('quantity');
+      return total_price + total_price * this.get('tax_rate');
     };
     LineItem.prototype.defaults = {
       quantity: 1,
       price: 100.00,
-      description: null
+      description: null,
+      tax_rate: 0
     };
     return LineItem;
   })();
@@ -145,7 +167,8 @@
     LineItemView.prototype.tagName = "tr";
     LineItemView.prototype.events = {
       "click .remove-line-item": "removeRow",
-      "change input": "fieldChanged"
+      "change input": "fieldChanged",
+      "change select": "selectionChanged"
     };
     LineItemView.prototype.initialize = function() {
       _.bindAll(this, 'render');
@@ -170,6 +193,14 @@
       field = $(e.currentTarget);
       data = {};
       data[field.attr('name')] = field.val();
+      return this.model.set(data);
+    };
+    LineItemView.prototype.selectionChanged = function(e) {
+      var data, field, value;
+      field = $(e.currentTarget);
+      value = $("option:selected", field).val();
+      data = {};
+      data[field.attr('name')] = value;
       return this.model.set(data);
     };
     return LineItemView;

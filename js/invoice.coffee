@@ -3,16 +3,30 @@
 # ------------------------------------------------------
 
 class window.LineItem extends Backbone.Model
-    
+  tax_rates:
+    0: "0%"
+    0.19: "19%"
+    0.22: "22%"
+    0.23: "23%"
+      
   initialize: ->
+    @tax_rates_option_tag = ""    
+    @tax_rates_option_tag += '<option value="' + rate + '">' + name + '</option>' for rate, name of @tax_rates     
+  
+
+  
+  getTaxRatesOptionTag: ->
+    @tax_rates_option_tag
   
   getTotalPrice: ->
-    @get('quantity') * @get('price')
+    total_price = @get('price') * @get('quantity')
+    total_price + total_price * @get('tax_rate')
         
   defaults:
     quantity: 1
     price: 100.00
     description: null
+    tax_rate: 0
 
 class window.Invoice extends Backbone.Model
     
@@ -68,7 +82,8 @@ class window.InvoiceForm extends Backbone.View
   events: 
     "click .save-invoice" : "handleSubmit"
     "click .new-line-item" : "newRow"
-    
+
+  initialize: ->
     _.bindAll(@, 'render')    
     @template = _.template($('#invoice-form-template').html())    
     
@@ -100,7 +115,8 @@ class window.InvoiceForm extends Backbone.View
     
   newRow: (e) ->
     view = new LineItemView({model: new LineItem})
-    @$('.line-items').append(view.render().el)    
+    @$('.line-items').append(view.render().el)
+
     
       
 class window.LineItemView extends Backbone.View
@@ -108,6 +124,7 @@ class window.LineItemView extends Backbone.View
   events: 
     "click .remove-line-item" : "removeRow"
     "change input": "fieldChanged"
+    "change select": "selectionChanged"
     
   initialize:  ->
     _.bindAll @, 'render'
@@ -127,7 +144,15 @@ class window.LineItemView extends Backbone.View
     field = $(e.currentTarget);
     data = {}
     data[field.attr('name')] = field.val()
-    @model.set(data);
+    @model.set(data)
+    
+  selectionChanged: (e) ->
+    field = $(e.currentTarget)        
+    value = $("option:selected", field).val()
+    data = {}
+    data[field.attr('name')] = value
+    @model.set(data)
+
 
 # ------------------------------------------------------
 # Routers
