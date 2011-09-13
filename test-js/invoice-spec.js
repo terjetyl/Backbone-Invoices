@@ -8,6 +8,21 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  describe("LineItem", function() {
+    beforeEach(function() {
+      return this.f = new LineItem;
+    });
+    it("shoudl have default value of 100 and quantity of 1", function() {
+      return expect(this.f.getTotalPrice()).toBe(100.00);
+    });
+    return it("calculated total price from quantity and item price", function() {
+      this.f.set({
+        quantity: 15,
+        price: 129.99
+      });
+      return expect(this.f.getTotalPrice()).toBe(1949.85);
+    });
+  });
   describe("Invoice", function() {
     beforeEach(function() {
       return this.f = new Invoice;
@@ -25,13 +40,31 @@
       });
       return expect(this.f2.formattedDate()).toBe('03/09/2011');
     });
-    return describe('newly created line items array', function() {
+    describe('newly created line items array', function() {
       it("should be size of 1", function() {
         return expect(this.f.get('line_items').length).toBe(1);
       });
       return it("with the length of 1 should have item price = 100.00 and quantity = 1", function() {
         expect(this.f.get('line_items')[0].get('price')).toBe(100.00);
         return expect(this.f.get('line_items')[0].get('quantity')).toBe(1);
+      });
+    });
+    return describe('amount calculations', function() {
+      return it("should return correct price from all assigned line items", function() {
+        var items;
+        items = [
+          new LineItem({
+            quantity: 10,
+            price: 120
+          }), new LineItem({
+            quantity: 5,
+            price: 19.99
+          })
+        ];
+        this.f.set({
+          line_items: items
+        });
+        return expect(this.f.getTotalPrice()).toBe(1299.95);
       });
     });
   });

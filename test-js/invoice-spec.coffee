@@ -1,3 +1,15 @@
+describe "LineItem", ->
+  beforeEach ->
+    @f = new LineItem
+  
+  it "shoudl have default value of 100 and quantity of 1", ->
+    expect(@f.getTotalPrice()).toBe 100.00  
+  
+  it "calculated total price from quantity and item price", ->
+    @f.set({quantity: 15, price: 129.99})
+    expect(@f.getTotalPrice()).toBe 1949.85  
+    
+
 describe "Invoice", ->
   beforeEach ->
     @f = new Invoice
@@ -18,7 +30,15 @@ describe "Invoice", ->
     it "with the length of 1 should have item price = 100.00 and quantity = 1", ->
       expect(@f.get('line_items')[0].get('price')).toBe 100.00
       expect(@f.get('line_items')[0].get('quantity')).toBe 1
-    
+  
+  describe 'amount calculations', ->
+    it "should return correct price from all assigned line items", ->
+      items = [
+        new LineItem({quantity: 10, price: 120})
+        new LineItem({quantity: 5, price: 19.99})
+      ]
+      @f.set({line_items: items})
+      expect(@f.getTotalPrice()).toBe 1299.95
 
 class window.InvoicesDouble extends Invoices
   localStorage: new Store("invoices-test")

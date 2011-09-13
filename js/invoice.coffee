@@ -6,7 +6,10 @@ class window.LineItem extends Backbone.Model
   
   
   initialize: ->
-
+  
+  getTotalPrice: ->
+    @get('quantity') * @get('price')
+        
   defaults:
     quantity: 1
     price: 100.00
@@ -22,6 +25,15 @@ class window.Invoice extends Backbone.Model
     seller_info: null
     buyer_info: null  
     line_items: [new LineItem]
+  
+  getTotalPrice: ->
+    total = 0
+    for item in @get('line_items')
+      total += item.getTotalPrice()
+    total  
+      
+
+  
     
       
   formattedDate: ->
@@ -102,22 +114,27 @@ class window.InvoiceForm extends Backbone.View
 
 class window.LineItemView extends Backbone.View
   tagName: "tr"
-  #$el: $('#line-items');
   events: 
     "click .remove-line-item" : "removeRow"
+    "change input": "fieldChanged"
     
   initialize:  ->
-    _.bindAll(@, 'render')    
-    @template = _.template($('#line-item-template').html())    
-
+    _.bindAll @, 'render'
+    @template = _.template $('#line-item-template').html()
+    @model.bind 'change', @render
   render: ->
     rendered_content = @template({model: @model})  
-    $(@.el).html(rendered_content)
+    $(@.el).html rendered_content
     @
   removeRow: (e) ->
     $(@.el).fadeOut 'slow', ->
       $(@el).remove()   
-
+  
+  fieldChanged: (e) ->
+    field = $(e.currentTarget);
+    data = {}
+    data[field.attr('name')] = field.val()
+    @model.set(data);
 
 # ------------------------------------------------------
 # Routers
@@ -130,13 +147,13 @@ class window.App extends Backbone.Router
     "new" : "newInvoice"
 
   initialize: ->
-    
-  index: ->  
     @invoiceIndex = new InvoiceIndex({collection: invoices})
+    @newInvoiceForm = new InvoiceForm({model: new Invoice})
+    
+  index: ->      
     @invoiceIndex.render()
   
   newInvoice: -> 
-    @newInvoiceForm = new InvoiceForm({model: new Invoice})
     @newInvoiceForm.render()
   
   edit: (id) ->

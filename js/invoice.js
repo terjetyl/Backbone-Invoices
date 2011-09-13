@@ -13,6 +13,9 @@
       LineItem.__super__.constructor.apply(this, arguments);
     }
     LineItem.prototype.initialize = function() {};
+    LineItem.prototype.getTotalPrice = function() {
+      return this.get('quantity') * this.get('price');
+    };
     LineItem.prototype.defaults = {
       quantity: 1,
       price: 100.00,
@@ -32,6 +35,16 @@
       seller_info: null,
       buyer_info: null,
       line_items: [new LineItem]
+    };
+    Invoice.prototype.getTotalPrice = function() {
+      var item, total, _i, _len, _ref;
+      total = 0;
+      _ref = this.get('line_items');
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        item = _ref[_i];
+        total += item.getTotalPrice();
+      }
+      return total;
     };
     Invoice.prototype.formattedDate = function() {
       return $.format.date(this.get('date').toString(), 'dd/MM/yyyy');
@@ -131,11 +144,13 @@
     }
     LineItemView.prototype.tagName = "tr";
     LineItemView.prototype.events = {
-      "click .remove-line-item": "removeRow"
+      "click .remove-line-item": "removeRow",
+      "change input": "fieldChanged"
     };
     LineItemView.prototype.initialize = function() {
       _.bindAll(this, 'render');
-      return this.template = _.template($('#line-item-template').html());
+      this.template = _.template($('#line-item-template').html());
+      return this.model.bind('change', this.render);
     };
     LineItemView.prototype.render = function() {
       var rendered_content;
@@ -150,6 +165,13 @@
         return $(this.el).remove();
       });
     };
+    LineItemView.prototype.fieldChanged = function(e) {
+      var data, field;
+      field = $(e.currentTarget);
+      data = {};
+      data[field.attr('name')] = field.val();
+      return this.model.set(data);
+    };
     return LineItemView;
   })();
   window.App = (function() {
@@ -162,17 +184,18 @@
       "invoices/:id": "edit",
       "new": "newInvoice"
     };
-    App.prototype.initialize = function() {};
-    App.prototype.index = function() {
+    App.prototype.initialize = function() {
       this.invoiceIndex = new InvoiceIndex({
         collection: invoices
       });
+      return this.newInvoiceForm = new InvoiceForm({
+        model: new Invoice
+      });
+    };
+    App.prototype.index = function() {
       return this.invoiceIndex.render();
     };
     App.prototype.newInvoice = function() {
-      this.newInvoiceForm = new InvoiceForm({
-        model: new Invoice
-      });
       return this.newInvoiceForm.render();
     };
     App.prototype.edit = function(id) {
