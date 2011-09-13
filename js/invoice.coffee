@@ -3,8 +3,7 @@
 # ------------------------------------------------------
 
 class window.LineItem extends Backbone.Model
-  
-  
+    
   initialize: ->
   
   getTotalPrice: ->
@@ -31,11 +30,7 @@ class window.Invoice extends Backbone.Model
     for item in @get('line_items')
       total += item.getTotalPrice()
     total  
-      
-
   
-    
-      
   formattedDate: ->
     $.format.date(@get('date').toString(), 'dd/MM/yyyy')
 
@@ -66,26 +61,26 @@ class window.InvoiceIndex extends Backbone.View
     rendered_content = @template({collection: @collection})  
     $(@.el).html(rendered_content)
     $('#app-container').html($(@.el))
-    @
+    @  
 
 
 class window.InvoiceForm extends Backbone.View
   events: 
-    "click #save-invoice" : "handleSubmit"
-    "click #new-line-item" : "newRow"
-  initialize:  ->
+    "click .save-invoice" : "handleSubmit"
+    "click .new-line-item" : "newRow"
+    
     _.bindAll(@, 'render')    
     @template = _.template($('#invoice-form-template').html())    
     
   render: ->
     rendered_content = @template({model: @model})  
-    $(@.el).html(rendered_content)
+    $(@.el).html rendered_content
    
       
     $('#app-container').html($(@.el))    
     for item in @model.get('line_items')
       view = new LineItemView({model: item})
-      @$('#line-items').append(view.render().el)    
+      @$('.line-items').append view.render().el    
     @
 
   handleSubmit: (e) ->
@@ -105,13 +100,9 @@ class window.InvoiceForm extends Backbone.View
     
   newRow: (e) ->
     view = new LineItemView({model: new LineItem})
-    $('#line-items').append(view.render().el)    
+    @$('.line-items').append(view.render().el)    
     
-
-    
-  
-    
-
+      
 class window.LineItemView extends Backbone.View
   tagName: "tr"
   events: 
@@ -122,10 +113,12 @@ class window.LineItemView extends Backbone.View
     _.bindAll @, 'render'
     @template = _.template $('#line-item-template').html()
     @model.bind 'change', @render
-  render: ->
+    
+  render: ->    
     rendered_content = @template({model: @model})  
     $(@.el).html rendered_content
     @
+    
   removeRow: (e) ->
     $(@.el).fadeOut 'slow', ->
       $(@el).remove()   
@@ -148,12 +141,12 @@ class window.App extends Backbone.Router
 
   initialize: ->
     @invoiceIndex = new InvoiceIndex({collection: invoices})
-    @newInvoiceForm = new InvoiceForm({model: new Invoice})
     
   index: ->      
     @invoiceIndex.render()
   
   newInvoice: -> 
+    @newInvoiceForm = new InvoiceForm({model: new Invoice})  
     @newInvoiceForm.render()
   
   edit: (id) ->
@@ -162,10 +155,7 @@ class window.App extends Backbone.Router
     @newInvoiceForm.render()
       
   
- 
-  
-  
-  
+
 $(document).ready ->
   window.app = new App
   Backbone.history.start()

@@ -49,12 +49,14 @@
             <tr>
               <th>Number</th>
               <th>Date</th>
+              <th>Total Price</th>
               <th colspan="2">Actions</th>
             </tr>
           <% collection.each(function(item) { %>
             <tr>
               <td><%= item.get('number') %></td>
               <td><%= item.formattedDate() %></td>      
+              <td><%= item.getTotalPrice() %></td>                    
               <td><a class="edit" href="#invoices/<%= item.cid %>">Edit</a></td>      
               <td><a class="delete" href="#delete">Delete</a></td>              
             </tr>  
@@ -96,11 +98,11 @@
           <th class="description_th">Price</th>        
         </tr>
        </thead>  
-       <tbody id="line-items"></tbody>
+       <tbody class="line-items"></tbody>
        </table>
-       <button id="new-line-item">New row</button>
+       <button class="new-line-item">New row</button>
        
-       <button id="save-invoice">Save</button>
+       <button class="save-invoice">Save</button>
     </script>
     
     

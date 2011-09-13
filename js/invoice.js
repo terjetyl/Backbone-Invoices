@@ -87,8 +87,8 @@
       InvoiceForm.__super__.constructor.apply(this, arguments);
     }
     InvoiceForm.prototype.events = {
-      "click #save-invoice": "handleSubmit",
-      "click #new-line-item": "newRow"
+      "click .save-invoice": "handleSubmit",
+      "click .new-line-item": "newRow"
     };
     InvoiceForm.prototype.initialize = function() {
       _.bindAll(this, 'render');
@@ -107,7 +107,7 @@
         view = new LineItemView({
           model: item
         });
-        this.$('#line-items').append(view.render().el);
+        this.$('.line-items').append(view.render().el);
       }
       return this;
     };
@@ -133,7 +133,7 @@
       view = new LineItemView({
         model: new LineItem
       });
-      return $('#line-items').append(view.render().el);
+      return this.$('.line-items').append(view.render().el);
     };
     return InvoiceForm;
   })();
@@ -185,17 +185,17 @@
       "new": "newInvoice"
     };
     App.prototype.initialize = function() {
-      this.invoiceIndex = new InvoiceIndex({
+      return this.invoiceIndex = new InvoiceIndex({
         collection: invoices
-      });
-      return this.newInvoiceForm = new InvoiceForm({
-        model: new Invoice
       });
     };
     App.prototype.index = function() {
       return this.invoiceIndex.render();
     };
     App.prototype.newInvoice = function() {
+      this.newInvoiceForm = new InvoiceForm({
+        model: new Invoice
+      });
       return this.newInvoiceForm.render();
     };
     App.prototype.edit = function(id) {
