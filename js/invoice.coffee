@@ -1,3 +1,17 @@
+# ------------------------------------------------------
+# Models
+# ------------------------------------------------------
+
+class window.LineItem extends Backbone.Model
+  
+  
+  initialize: ->
+
+  defaults:
+    quantity: 1
+    price: 100.00
+    description: null
+
 class window.Invoice extends Backbone.Model
     
   initialize: ->
@@ -7,15 +21,29 @@ class window.Invoice extends Backbone.Model
     number: '000001'
     seller_info: null
     buyer_info: null  
+    line_items: [new LineItem]
+    
+      
   formattedDate: ->
     $.format.date(@get('date').toString(), 'dd/MM/yyyy')
-  
+
+
+# ------------------------------------------------------
+# Collections
+# ------------------------------------------------------
+
+
 
 class window.Invoices extends Backbone.Collection
   model: Invoice 
   localStorage: new Store("invoices")
 
 window.Invoices = new Invoices
+    
+    
+# ------------------------------------------------------
+# Views
+# ------------------------------------------------------    
     
 class window.InvoiceIndex extends Backbone.View
   initialize:  ->
@@ -31,7 +59,8 @@ class window.InvoiceIndex extends Backbone.View
 
 class window.InvoiceForm extends Backbone.View
   events: 
-    "click button" : "handleSubmit"
+    "click #save-invoice" : "handleSubmit"
+    "click #new-line-item" : "newRow"
   initialize:  ->
     _.bindAll(@, 'render')    
     @template = _.template($('#invoice-form-template').html())    
@@ -39,7 +68,12 @@ class window.InvoiceForm extends Backbone.View
   render: ->
     rendered_content = @template({model: @model})  
     $(@.el).html(rendered_content)
+   
+      
     $('#app-container').html($(@.el))    
+    for item in @model.get('line_items')
+      view = new LineItemView({model: item})
+      @$('#line-items').append(view.render().el)    
     @
 
   handleSubmit: (e) ->
@@ -57,13 +91,43 @@ class window.InvoiceForm extends Backbone.View
     e.stopPropagation()    
     window.location.hash = "#"
     
+  newRow: (e) ->
+    view = new LineItemView({model: new LineItem})
+    $('#line-items').append(view.render().el)    
+    
+
+    
+  
+    
+
+class window.LineItemView extends Backbone.View
+  tagName: "tr"
+  #$el: $('#line-items');
+  events: 
+    "click .remove-line-item" : "removeRow"
+    
+  initialize:  ->
+    _.bindAll(@, 'render')    
+    @template = _.template($('#line-item-template').html())    
+
+  render: ->
+    rendered_content = @template({model: @model})  
+    $(@.el).html(rendered_content)
+    @
+  removeRow: (e) ->
+    @model.destroy()
+
+
+# ------------------------------------------------------
+# Routers
+# ------------------------------------------------------
   
 class window.App extends Backbone.Router
   routes :            
     "" : "index"
     "invoices/:id" : "edit"
     "new" : "newInvoice"
-  
+
   initialize: ->
     
   index: ->  

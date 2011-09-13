@@ -1,5 +1,5 @@
 (function() {
-  var InvoicesTest, invoices, item, _i, _len;
+  var item, _i, _len;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -19,40 +19,44 @@
       expect(this.f.get('date').getDay).toBe(d.getDay);
       return expect(this.f.get('date').getFullYear).toBe(d.getFullYear);
     });
-    return it("should provide formatted date while calling formattedDate()", function() {
+    it("should provide formatted date while calling formattedDate()", function() {
       this.f2 = new Invoice({
         date: new Date('2011-09-03')
       });
       return expect(this.f2.formattedDate()).toBe('03/09/2011');
     });
+    return it("should have one default line item on createion", function() {
+      return expect(this.f.get('line_items').length).toBe(1);
+    });
   });
-  window.InvoicesTest = InvoicesTest = (function() {
-    __extends(InvoicesTest, Invoices);
-    function InvoicesTest() {
-      InvoicesTest.__super__.constructor.apply(this, arguments);
+  window.InvoicesDouble = (function() {
+    __extends(InvoicesDouble, Backbone.Collection);
+    function InvoicesDouble() {
+      InvoicesDouble.__super__.constructor.apply(this, arguments);
     }
-    InvoicesTest.prototype.localStorage = new Store("invoices-test");
-    return InvoicesTest;
+    InvoicesDouble.prototype.model = Invoice;
+    InvoicesDouble.prototype.localStorage = new Store("invoices-test");
+    return InvoicesDouble;
   })();
-  invoices = new InvoicesTest;
+  window.invoices_test = new InvoicesDouble;
   describe("Invoices", function() {
     it("should be empty at first", function() {
-      return expect(invoices.length).toBe(0);
+      return expect(invoices_test.length).toBe(0);
     });
     it("should save attributes successfully", function() {
       var attrs;
       attrs = {
         number: '000001'
       };
-      invoices.create(attrs);
-      return expect(invoices.length).toBe(1);
+      invoices_test.create(attrs);
+      return expect(invoices_test.length).toBe(1);
     });
     return it("should read attributes correctly from locastorage", function() {
-      return expect(invoices.first().get('number')).toBe('000001');
+      return expect(invoices_test.first().get('number')).toBe('000001');
     });
   });
-  for (_i = 0, _len = invoices.length; _i < _len; _i++) {
-    item = invoices[_i];
+  for (_i = 0, _len = invoices_test.length; _i < _len; _i++) {
+    item = invoices_test[_i];
     item.destroy;
   }
 }).call(this);

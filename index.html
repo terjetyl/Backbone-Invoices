@@ -68,28 +68,63 @@
     
     <script type="text/template" id='invoice-form-template'>
 
-         <div>
-           <label>Date</label>
-           <input type="text" value="<%= model.formattedDate() %>" name="date" />
-         </div>
-         
-         <div>
-            <label>Number</label>
-            <input type="text" value="<%= model.get('number') %>" name="number" />
-         </div>
-        
-         <div>
-            <label>Buyer details</label>
-            <textarea name="buyer_info" rows="8" cols="40"><%= model.get('buyer_info') %></textarea>
-         </div>
-         
-         <div>
-            <label>Seller details</label>
-            <textarea name="seller_info" rows="8" cols="40"><%= model.get('seller_info') %></textarea>
-         </div>
-
-         <button type="submit">Save</button>
+       <div>
+         <label>Date</label>
+         <input type="text" value="<%= model.formattedDate() %>" name="date" />
+       </div>
+       
+       <div>
+          <label>Number</label>
+          <input type="text" value="<%= model.get('number') %>" name="number" />
+       </div>
+      
+       <div>
+          <label>Buyer details</label>
+          <textarea name="buyer_info" rows="8" cols="40"><%= model.get('buyer_info') %></textarea>
+       </div>
+       
+       <div>
+          <label>Seller details</label>
+          <textarea name="seller_info" rows="8" cols="40"><%= model.get('seller_info') %></textarea>
+       </div>
+       
+       <table class="items">
+       <thead>
+        <tr>
+          <th class="quantity_th">Quantity</th>
+          <th class="price_th">Price</th>   
+          <th class="description_th">Price</th>        
+        </tr>
+       </thead>  
+       <tbody id="line-items"></tbody>
+       </table>
+       <button id="new-line-item">New row</button>
+       
+       <button id="save-invoice">Save</button>
     </script>
+    
+    
+    <script type="text/template" id='line-item-template'>
+
+      <td>         
+        <input type="text" value="<%= model.get('quantity') %>" name="quantity" />
+      </td>
+       
+      <td>
+        <input type="text" value="<%= model.get('price') %>" name="price" />
+      </td>
+       
+      <td>
+        <textarea name="descripion" rows="2" cols="30"><%= model.get('description') %></textarea>               
+      </td>
+      <td>
+        <button class="remove-line-item">(X)</button>      
+      </td>
+        
+        
+        
+    </script>
+    
     
   </body>
   </html>

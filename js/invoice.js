@@ -7,6 +7,19 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  window.LineItem = (function() {
+    __extends(LineItem, Backbone.Model);
+    function LineItem() {
+      LineItem.__super__.constructor.apply(this, arguments);
+    }
+    LineItem.prototype.initialize = function() {};
+    LineItem.prototype.defaults = {
+      quantity: 1,
+      price: 100.00,
+      description: null
+    };
+    return LineItem;
+  })();
   window.Invoice = (function() {
     __extends(Invoice, Backbone.Model);
     function Invoice() {
@@ -17,7 +30,8 @@
       date: new Date,
       number: '000001',
       seller_info: null,
-      buyer_info: null
+      buyer_info: null,
+      line_items: [new LineItem]
     };
     Invoice.prototype.formattedDate = function() {
       return $.format.date(this.get('date').toString(), 'dd/MM/yyyy');
@@ -60,19 +74,28 @@
       InvoiceForm.__super__.constructor.apply(this, arguments);
     }
     InvoiceForm.prototype.events = {
-      "click button": "handleSubmit"
+      "click #save-invoice": "handleSubmit",
+      "click #new-line-item": "newRow"
     };
     InvoiceForm.prototype.initialize = function() {
       _.bindAll(this, 'render');
       return this.template = _.template($('#invoice-form-template').html());
     };
     InvoiceForm.prototype.render = function() {
-      var rendered_content;
+      var item, rendered_content, view, _i, _len, _ref;
       rendered_content = this.template({
         model: this.model
       });
       $(this.el).html(rendered_content);
       $('#app-container').html($(this.el));
+      _ref = this.model.get('line_items');
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        item = _ref[_i];
+        view = new LineItemView({
+          model: item
+        });
+        this.$('#line-items').append(view.render().el);
+      }
       return this;
     };
     InvoiceForm.prototype.handleSubmit = function(e) {
@@ -92,7 +115,40 @@
       e.stopPropagation();
       return window.location.hash = "#";
     };
+    InvoiceForm.prototype.newRow = function(e) {
+      var view;
+      view = new LineItemView({
+        model: new LineItem
+      });
+      return $('#line-items').append(view.render().el);
+    };
     return InvoiceForm;
+  })();
+  window.LineItemView = (function() {
+    __extends(LineItemView, Backbone.View);
+    function LineItemView() {
+      LineItemView.__super__.constructor.apply(this, arguments);
+    }
+    LineItemView.prototype.tagName = "tr";
+    LineItemView.prototype.events = {
+      "click .remove-line-item": "removeRow"
+    };
+    LineItemView.prototype.initialize = function() {
+      _.bindAll(this, 'render');
+      return this.template = _.template($('#line-item-template').html());
+    };
+    LineItemView.prototype.render = function() {
+      var rendered_content;
+      rendered_content = this.template({
+        model: this.model
+      });
+      $(this.el).html(rendered_content);
+      return this;
+    };
+    LineItemView.prototype.removeRow = function(e) {
+      return this.model.destroy();
+    };
+    return LineItemView;
   })();
   window.App = (function() {
     __extends(App, Backbone.Router);

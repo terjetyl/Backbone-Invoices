@@ -11,28 +11,35 @@ describe "Invoice", ->
   it "should provide formatted date while calling formattedDate()", ->
     @f2 = new Invoice({date:new Date('2011-09-03')})
     expect(@f2.formattedDate()).toBe '03/09/2011'
+  it "should have one default line item on createion", ->
+    expect(@f.get('line_items').length).toBe 1  
     
-window.InvoicesTest = class InvoicesTest extends Invoices    
+#window.InvoicesTest = class InvoicesTest extends Invoices    
+#  localStorage: new Store("invoices-test")
+
+class window.InvoicesDouble extends Backbone.Collection
+  model: Invoice 
   localStorage: new Store("invoices-test")
 
-invoices = new InvoicesTest  
+window.invoices_test = new InvoicesDouble
+
   
 describe "Invoices", ->    
   
   it "should be empty at first", ->
-    expect(invoices.length).toBe 0
+    expect(invoices_test.length).toBe 0
     
   it "should save attributes successfully", ->
     attrs = {
       number : '000001'    
     }
-    invoices.create(attrs)
-    expect(invoices.length).toBe 1
+    invoices_test.create(attrs)
+    expect(invoices_test.length).toBe 1
   
   it "should read attributes correctly from locastorage", ->
-    expect(invoices.first().get('number')).toBe '000001' 
+    expect(invoices_test.first().get('number')).toBe '000001' 
     
-for item in invoices
+for item in invoices_test
     item.destroy
 
 
