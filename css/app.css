@@ -1,0 +1,9 @@
+#page-container {
+	width: 760px;
+	margin: auto;	
+}
+
+#header {
+  height: 50px;
+  background-color: grey;
+}
