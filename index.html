@@ -26,6 +26,10 @@
       <h3 id="small-header">by Michał Dąbrowski</h3>
       <h2 id="header">Backbone invoices</h2>
       
+      <div id="navigation">
+        <a href="#" title="List invoices">List invoices</a>
+        <a href="#new" title="New Invoice">New Invoice</a>
+      </div>
       
       <div id="app-container">
 
@@ -36,16 +40,18 @@
     
     <script type="text/template" id='invoice-list-template'>
       <% if(collection.models.length > 0) { %>
-          <h4><a href='#new'>Create New</a></h4>
           <table>
             <tr>
               <th>Number</th>
               <th>Date</th>
+              <th colspan="2">Actions</th>
             </tr>
           <% collection.each(function(item) { %>
             <tr>
               <td><%= item.get('number') %></td>
-              <td><%= item.formattedDate() %></td>              
+              <td><%= item.formattedDate() %></td>      
+              <td><a class="edit" href="#invoices/<%= item.cid %>">Edit</a></td>      
+              <td><a class="delete" href="#delete">Delete</a></td>              
             </tr>  
           <% }); %>
           </table>

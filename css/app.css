@@ -1,10 +1,13 @@
 body, div, h1, form, fieldset, input, textarea {
 	margin: 0; padding: 0; border: 0; outline: none;
+	font-family: "MetaBold Roman", "Myriad Pro", Arial;
+  
 }
 
 html {
 	height: 100%;
 }
+
 
 label {
 	float: left; clear: left; margin: 11px 20px 0 0; width: 95px;
@@ -19,7 +22,7 @@ input {
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#546A7F), color-stop(20%,#5E768D)); /* webkit */
 	border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;
 	-moz-box-shadow: 0px 1px 0px #f2f2f2;-webkit-box-shadow: 0px 1px 0px #f2f2f2;
-	font-family: sans-serif; font-size: 16px; color: #f2f2f2; text-shadow: 0px -1px 0px #334f71;
+	font-size: 16px; color: #f2f2f2; text-shadow: 0px -1px 0px #334f71;
 }
 	input::-webkit-input-placeholder  {
     	color: #a1b2c3; text-shadow: 0px -1px 0px #38506b;
@@ -90,3 +93,28 @@ h2#header {
   float:right;
 }
 
+#app-container {
+  padding: 20px;
+}
+
+table {
+  font-size: 15px;
+  width: 100%;
+  border:0;
+  border-collapse: collapse;
+}
+table th {
+  background: #5E768D;
+  padding: 7px;
+  border:0;
+  color:#FFFFFF;
+  
+  font-size: 17px;
+  font-family: "MetaBold Roman", "Myriad Pro", Arial;
+}
+table td {
+  padding: 9px;
+  line-height: 17px;
+  font-size: 15px;
+  color:#333333;
+}

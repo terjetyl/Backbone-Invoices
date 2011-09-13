@@ -49,7 +49,10 @@ class window.InvoiceForm extends Backbone.View
       buyer_info : @$("textarea[name='buyer_info']").val(), 
       seller_info : @$("textarea[name='seller_info']").val()
     }
-    Invoices.add(data)
+    if @model.isNew()
+      Invoices.create(data)
+    else
+      @model.save(data)
     e.preventDefault()
     e.stopPropagation()    
     window.location.hash = "#"
@@ -58,7 +61,7 @@ class window.InvoiceForm extends Backbone.View
 class window.App extends Backbone.Router
   routes :            
     "" : "index"
-    "#" : "index"
+    "invoices/:id" : "edit"
     "new" : "newInvoice"
   
   initialize: ->
@@ -70,6 +73,12 @@ class window.App extends Backbone.Router
   newInvoice: -> 
     @newInvoiceForm = new InvoiceForm({model: new Invoice})
     @newInvoiceForm.render()
+  
+  edit: (id) ->
+    inv = Invoices.getByCid(id)
+    @newInvoiceForm = new InvoiceForm({model: inv})
+    @newInvoiceForm.render()
+      
   
  
   

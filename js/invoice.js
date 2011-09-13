@@ -83,7 +83,11 @@
         buyer_info: this.$("textarea[name='buyer_info']").val(),
         seller_info: this.$("textarea[name='seller_info']").val()
       };
-      Invoices.add(data);
+      if (this.model.isNew()) {
+        Invoices.create(data);
+      } else {
+        this.model.save(data);
+      }
       e.preventDefault();
       e.stopPropagation();
       return window.location.hash = "#";
@@ -97,7 +101,7 @@
     }
     App.prototype.routes = {
       "": "index",
-      "#": "index",
+      "invoices/:id": "edit",
       "new": "newInvoice"
     };
     App.prototype.initialize = function() {};
@@ -110,6 +114,14 @@
     App.prototype.newInvoice = function() {
       this.newInvoiceForm = new InvoiceForm({
         model: new Invoice
+      });
+      return this.newInvoiceForm.render();
+    };
+    App.prototype.edit = function(id) {
+      var inv;
+      inv = Invoices.getByCid(id);
+      this.newInvoiceForm = new InvoiceForm({
+        model: inv
       });
       return this.newInvoiceForm.render();
     };
