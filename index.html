@@ -34,10 +34,28 @@
     </div>
     
     
-    
+    <script type="text/template" id='invoice-list-template'>
+      <% if(collection.models.length > 0) { %>
+          <h4><a href='#new'>Create New</a></h4>
+          <table>
+            <tr>
+              <th>Number</th>
+              <th>Date</th>
+            </tr>
+          <% collection.each(function(item) { %>
+            <tr>
+              <td><%= item.get('number') %></td>
+              <td><%= item.formattedDate() %></td>              
+            </tr>  
+          <% }); %>
+          </table>
+      <% } else { %>
+          <h4>No invoices! <a href='#new'>Create one</a></h4>
+      <% } %>
+      
+    </script>
     
     <script type="text/template" id='invoice-form-template'>
-      <form action="#" method="post">
 
          <div>
            <label>Date</label>
@@ -60,7 +78,6 @@
          </div>
 
          <button type="submit">Save</button>
-       </form>
     </script>
     
   </body>

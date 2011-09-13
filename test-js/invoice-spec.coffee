@@ -13,7 +13,7 @@ describe "Invoice", ->
     expect(@f2.formattedDate()).toBe '03/09/2011'
     
 window.InvoicesTest = class InvoicesTest extends Invoices    
-  localStorage: new window.Store("invoices-test")
+  localStorage: new Store("invoices-test")
 
 invoices = new InvoicesTest  
   

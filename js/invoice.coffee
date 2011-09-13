@@ -6,37 +6,40 @@ class window.Invoice extends Backbone.Model
     date: new Date
     number: '000001'
     seller_info: null
-    buyer_info: null
-  
+    buyer_info: null  
   formattedDate: ->
     $.format.date(@get('date').toString(), 'dd/MM/yyyy')
   
 
-class window.InvoiceView extends Backbone.View
-
-
-
 class window.Invoices extends Backbone.Collection
   model: Invoice 
-  localStorage: new window.Store("invoices")
+  localStorage: new Store("invoices")
 
-window.invoices = new Invoices
+window.Invoices = new Invoices
+    
+class window.InvoiceIndex extends Backbone.View
+  initialize:  ->
+    _.bindAll(@, 'render')    
+    @template = _.template($('#invoice-list-template').html())    
+
+  render: ->
+    rendered_content = @template({collection: @collection})  
+    $(@.el).html(rendered_content)
+    $('#app-container').html($(@.el))
+    @
+
 
 class window.InvoiceForm extends Backbone.View
-    
   events: 
-    "submit form" : "handleSubmit"
-  
-    
+    "click button" : "handleSubmit"
   initialize:  ->
-
     _.bindAll(@, 'render')    
-    @template = _.template($('#invoice-form-template').html())
+    @template = _.template($('#invoice-form-template').html())    
     
   render: ->
-    
     rendered_content = @template({model: @model})  
-    $(@el).html(rendered_content)      
+    $(@.el).html(rendered_content)
+    $('#app-container').html($(@.el))    
     @
 
   handleSubmit: (e) ->
@@ -46,27 +49,29 @@ class window.InvoiceForm extends Backbone.View
       buyer_info : @$("textarea[name='buyer_info']").val(), 
       seller_info : @$("textarea[name='seller_info']").val()
     }
-    @model.save(data)
-    console.log(@model)
-    return false 
+    Invoices.add(data)
     e.preventDefault()
     e.stopPropagation()    
+    window.location.hash = "#"
     
   
 class window.App extends Backbone.Router
   routes :            
-    "" : "home"
-    "list" : "list"
+    "" : "index"
+    "#" : "index"
+    "new" : "newInvoice"
   
   initialize: ->
-    @invoiceFormView = new InvoiceForm({model: new Invoice})
     
-  home: ->  
-    $('#app-container').html(@invoiceFormView.render().el)
+  index: ->  
+    @invoiceIndex = new InvoiceIndex({collection: Invoices})
+    @invoiceIndex.render()
   
-  list: ->  
-    $('#app-container').html("listing")
+  newInvoice: -> 
+    @newInvoiceForm = new InvoiceForm({model: new Invoice})
+    @newInvoiceForm.render()
   
+ 
   
   
   

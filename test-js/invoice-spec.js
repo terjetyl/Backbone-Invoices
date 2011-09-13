@@ -31,7 +31,7 @@
     function InvoicesTest() {
       InvoicesTest.__super__.constructor.apply(this, arguments);
     }
-    InvoicesTest.prototype.localStorage = new window.Store("invoices-test");
+    InvoicesTest.prototype.localStorage = new Store("invoices-test");
     return InvoicesTest;
   })();
   invoices = new InvoicesTest;

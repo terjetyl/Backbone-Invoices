@@ -24,30 +24,43 @@
     };
     return Invoice;
   })();
-  window.InvoiceView = (function() {
-    __extends(InvoiceView, Backbone.View);
-    function InvoiceView() {
-      InvoiceView.__super__.constructor.apply(this, arguments);
-    }
-    return InvoiceView;
-  })();
   window.Invoices = (function() {
     __extends(Invoices, Backbone.Collection);
     function Invoices() {
       Invoices.__super__.constructor.apply(this, arguments);
     }
     Invoices.prototype.model = Invoice;
-    Invoices.prototype.localStorage = new window.Store("invoices");
+    Invoices.prototype.localStorage = new Store("invoices");
     return Invoices;
   })();
-  window.invoices = new Invoices;
+  window.Invoices = new Invoices;
+  window.InvoiceIndex = (function() {
+    __extends(InvoiceIndex, Backbone.View);
+    function InvoiceIndex() {
+      InvoiceIndex.__super__.constructor.apply(this, arguments);
+    }
+    InvoiceIndex.prototype.initialize = function() {
+      _.bindAll(this, 'render');
+      return this.template = _.template($('#invoice-list-template').html());
+    };
+    InvoiceIndex.prototype.render = function() {
+      var rendered_content;
+      rendered_content = this.template({
+        collection: this.collection
+      });
+      $(this.el).html(rendered_content);
+      $('#app-container').html($(this.el));
+      return this;
+    };
+    return InvoiceIndex;
+  })();
   window.InvoiceForm = (function() {
     __extends(InvoiceForm, Backbone.View);
     function InvoiceForm() {
       InvoiceForm.__super__.constructor.apply(this, arguments);
     }
     InvoiceForm.prototype.events = {
-      "submit form": "handleSubmit"
+      "click button": "handleSubmit"
     };
     InvoiceForm.prototype.initialize = function() {
       _.bindAll(this, 'render');
@@ -59,6 +72,7 @@
         model: this.model
       });
       $(this.el).html(rendered_content);
+      $('#app-container').html($(this.el));
       return this;
     };
     InvoiceForm.prototype.handleSubmit = function(e) {
@@ -69,11 +83,10 @@
         buyer_info: this.$("textarea[name='buyer_info']").val(),
         seller_info: this.$("textarea[name='seller_info']").val()
       };
-      this.model.save(data);
-      console.log(this.model);
-      return false;
+      Invoices.add(data);
       e.preventDefault();
-      return e.stopPropagation();
+      e.stopPropagation();
+      return window.location.hash = "#";
     };
     return InvoiceForm;
   })();
@@ -83,19 +96,22 @@
       App.__super__.constructor.apply(this, arguments);
     }
     App.prototype.routes = {
-      "": "home",
-      "list": "list"
+      "": "index",
+      "#": "index",
+      "new": "newInvoice"
     };
-    App.prototype.initialize = function() {
-      return this.invoiceFormView = new InvoiceForm({
+    App.prototype.initialize = function() {};
+    App.prototype.index = function() {
+      this.invoiceIndex = new InvoiceIndex({
+        collection: Invoices
+      });
+      return this.invoiceIndex.render();
+    };
+    App.prototype.newInvoice = function() {
+      this.newInvoiceForm = new InvoiceForm({
         model: new Invoice
       });
-    };
-    App.prototype.home = function() {
-      return $('#app-container').html(this.invoiceFormView.render().el);
-    };
-    App.prototype.list = function() {
-      return $('#app-container').html("listing");
+      return this.newInvoiceForm.render();
     };
     return App;
   })();
