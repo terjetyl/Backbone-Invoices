@@ -9,6 +9,7 @@
 
     <!-- include source files here... -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.date_format.js"></script>
     
     <script type="text/javascript" src="js/underscore.js"></script>
     <script type="text/javascript" src="js/backbone.js"></script>
@@ -19,9 +20,45 @@
   <body>
     
     <div id="page-container">
-      <h2>Backbone invoices</h2>
-    </div>
+      <h2 id="header">Backbone invoices</h2>
+      
+      
+      <div id="invoice-form">
 
+      </div>
+      
+    </div>
+    
+    
+    
+    
+    <script type="text/template" id='invoice-form-template'>
+      <form action="#" method="post">
+
+         <div>
+           <label>Date</label>
+           <input type="text" value="<%= model.formattedDate() %>" name="date" />
+         </div>
+         
+         <div>
+            <label>Number</label>
+            <input type="text" value="<%= model.get('number') %>" name="number" />
+         </div>
+        
+         <div>
+            <label>Buyer details</label>
+            <textarea name="buyer_info" rows="8" cols="40"><%= model.get('buyer_info') %></textarea>
+         </div>
+         
+         <div>
+            <label>Seller details</label>
+            <textarea name="seller_info" rows="8" cols="40"><%= model.get('seller_info') %></textarea>
+         </div>
+
+         <button type="submit" data-role="button">Save</button>
+       </form>
+    </script>
+    
   </body>
   </html>
   
