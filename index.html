@@ -10,9 +10,12 @@
     <!-- include source files here... -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/jquery.date_format.js"></script>
+    <script type="text/javascript" src="js/json2.js"></script>
     
     <script type="text/javascript" src="js/underscore.js"></script>
     <script type="text/javascript" src="js/backbone.js"></script>
+    <script type="text/javascript" src="js/backbone.localstorage.js"></script>
+    
     <script type="text/javascript" src="js/invoice.js"></script>
 
 
@@ -20,10 +23,11 @@
   <body>
     
     <div id="page-container">
+      <h3 id="small-header">by Michał Dąbrowski</h3>
       <h2 id="header">Backbone invoices</h2>
       
       
-      <div id="invoice-form">
+      <div id="app-container">
 
       </div>
       
@@ -55,7 +59,7 @@
             <textarea name="seller_info" rows="8" cols="40"><%= model.get('seller_info') %></textarea>
          </div>
 
-         <button type="submit" data-role="button">Save</button>
+         <button type="submit">Save</button>
        </form>
     </script>
     
