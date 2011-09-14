@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Backbone invoices - by Michał Dąbrowski (dabrowski@brillante.pl)</title>
     <link rel="stylesheet" type="text/css" href="css/app.css">
-  
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-1.2.0.min.css">
 
     <!-- include source files here... -->
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -32,8 +32,10 @@
       </p>
       
       <div id="navigation">
-        <a href="#" title="List invoices">List invoices</a>
-        <a href="#new" title="New Invoice">New Invoice</a>
+        <ul class="pills">
+          <li id="list-invoices-menu-item" ><a href="#" title="List invoices">List invoices</a></li>
+          <li id="new-invoice-menu-item"><a href="#new"  title="New Invoice">New Invoice</a></li>
+        </ul>
       </div>
       
       <div id="app-container">
@@ -101,9 +103,9 @@
        </thead>  
        <tbody class="line-items"></tbody>
        </table>
-       <button class="new-line-item">New row</button>
+       <button class="btn new-line-item">New row</button>
        
-       <button class="save-invoice">Save</button>
+       <button class="btn primary save-invoice">Save</button>
     </script>
     
     

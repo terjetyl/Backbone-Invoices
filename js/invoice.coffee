@@ -168,17 +168,24 @@ class window.App extends Backbone.Router
     @invoiceIndex = new InvoiceIndex({collection: invoices})
     
   index: ->      
+    @clearMenuActiveClass()
     @invoiceIndex.render()
+    $('#list-invoices-menu-item').addClass 'active'
   
   newInvoice: -> 
+    @clearMenuActiveClass()
     @newInvoiceForm = new InvoiceForm({model: new Invoice})  
     @newInvoiceForm.render()
+    $('#new-invoice-menu-item').addClass 'active'
   
   edit: (id) ->
     inv = invoices.getByCid(id)
     @newInvoiceForm = new InvoiceForm({model: inv})
     @newInvoiceForm.render()
-      
+  
+  clearMenuActiveClass: ->
+    $(li).removeClass('active') for li in $('#navigation ul li')
+
   
 
 $(document).ready ->

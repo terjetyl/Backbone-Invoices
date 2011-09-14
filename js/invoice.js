@@ -221,13 +221,17 @@
       });
     };
     App.prototype.index = function() {
-      return this.invoiceIndex.render();
+      this.clearMenuActiveClass();
+      this.invoiceIndex.render();
+      return $('#list-invoices-menu-item').addClass('active');
     };
     App.prototype.newInvoice = function() {
+      this.clearMenuActiveClass();
       this.newInvoiceForm = new InvoiceForm({
         model: new Invoice
       });
-      return this.newInvoiceForm.render();
+      this.newInvoiceForm.render();
+      return $('#new-invoice-menu-item').addClass('active');
     };
     App.prototype.edit = function(id) {
       var inv;
@@ -236,6 +240,16 @@
         model: inv
       });
       return this.newInvoiceForm.render();
+    };
+    App.prototype.clearMenuActiveClass = function() {
+      var li, _i, _len, _ref, _results;
+      _ref = $('#navigation ul li');
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        li = _ref[_i];
+        _results.push($(li).removeClass('active'));
+      }
+      return _results;
     };
     return App;
   })();
