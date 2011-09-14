@@ -66,10 +66,32 @@
         item = _ref[_i];
         total += item.getTotalPrice();
       }
-      return total;
+      return this.numberFormat(total, 2);
     };
     Invoice.prototype.formattedDate = function() {
       return $.format.date(this.get('date').toString(), 'dd/MM/yyyy');
+    };
+    Invoice.prototype.numberFormat = function(number, decimals, dec_point, thousands_sep) {
+      var dec, n, prec, s, sep, toFixedFix;
+      n = (!isFinite(+number) ? 0 : +number);
+      prec = (!isFinite(+decimals) ? 0 : Math.abs(decimals));
+      sep = (typeof thousands_sep === "undefined" ? "." : thousands_sep);
+      dec = (typeof dec_point === "undefined" ? "," : dec_point);
+      s = "";
+      toFixedFix = function(n, prec) {
+        var k;
+        k = Math.pow(10, prec);
+        return "" + Math.round(n * k) / k;
+      };
+      s = (prec ? toFixedFix(n, prec) : "" + Math.round(n)).split(".");
+      if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+      }
+      if ((s[1] || "").length < prec) {
+        s[1] = s[1] || "";
+        s[1] += new Array(prec - s[1].length + 1).join("0");
+      }
+      return s.join(dec);
     };
     return Invoice;
   })();
@@ -127,7 +149,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         item = _ref[_i];
         view = new LineItemView({
-          model: item
+          model: new LineItem
         });
         this.$('.line-items').append(view.render().el);
       }
@@ -151,11 +173,18 @@
       return window.location.hash = "#";
     };
     InvoiceForm.prototype.newRow = function(e) {
-      var view;
-      view = new LineItemView({
-        model: new LineItem
+      var item, line_items, view;
+      item = new LineItem;
+      line_items = this.model.get('line_items');
+      line_items.push(item);
+      this.model.set({
+        line_items: line_items
       });
-      return this.$('.line-items').append(view.render().el);
+      view = new LineItemView({
+        model: item
+      });
+      this.$('.line-items').append(view.render().el);
+      return e.preventDefault();
     };
     return InvoiceForm;
   })();
@@ -184,9 +213,10 @@
       return this;
     };
     LineItemView.prototype.removeRow = function(e) {
-      return $(this.el).fadeOut('slow', function() {
+      $(this.el).fadeOut('slow', function() {
         return $(this.el).remove();
       });
+      return e.preventDefault();
     };
     LineItemView.prototype.fieldChanged = function(e) {
       var data, field;
@@ -226,11 +256,12 @@
       return $('#list-invoices-menu-item').addClass('active');
     };
     App.prototype.newInvoice = function() {
+      var newInvoiceForm;
       this.clearMenuActiveClass();
-      this.newInvoiceForm = new InvoiceForm({
+      newInvoiceForm = new InvoiceForm({
         model: new Invoice
       });
-      this.newInvoiceForm.render();
+      newInvoiceForm.render();
       return $('#new-invoice-menu-item').addClass('active');
     };
     App.prototype.edit = function(id) {

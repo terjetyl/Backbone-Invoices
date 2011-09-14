@@ -43,11 +43,27 @@ class window.Invoice extends Backbone.Model
     total = 0
     for item in @get('line_items')
       total += item.getTotalPrice()
-    total  
+    @numberFormat(total, 2)  
   
   formattedDate: ->
     $.format.date(@get('date').toString(), 'dd/MM/yyyy')
 
+  numberFormat: (number, decimals, dec_point, thousands_sep) ->
+    n = (if not isFinite(+number) then 0 else +number)
+    prec = (if not isFinite(+decimals) then 0 else Math.abs(decimals))
+    sep = (if (typeof thousands_sep == "undefined") then "." else thousands_sep)
+    dec = (if (typeof dec_point == "undefined") then "," else dec_point)
+    s = ""
+    toFixedFix = (n, prec) ->
+      k = Math.pow(10, prec)
+      "" + Math.round(n * k) / k
+
+    s = (if prec then toFixedFix(n, prec) else "" + Math.round(n)).split(".")
+    s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep)  if s[0].length > 3
+    if (s[1] or "").length < prec
+      s[1] = s[1] or ""
+      s[1] += new Array(prec - s[1].length + 1).join("0")
+    s.join dec
 
 # ------------------------------------------------------
 # Collections
@@ -87,6 +103,7 @@ class window.InvoiceForm extends Backbone.View
     _.bindAll(@, 'render')    
     @template = _.template($('#invoice-form-template').html())    
     
+    
   render: ->
     rendered_content = @template({model: @model})  
     $(@.el).html rendered_content
@@ -94,7 +111,7 @@ class window.InvoiceForm extends Backbone.View
       
     $('#app-container').html($(@.el))    
     for item in @model.get('line_items')
-      view = new LineItemView({model: item})
+      view = new LineItemView({model: new LineItem})
       @$('.line-items').append view.render().el    
     @
 
@@ -104,7 +121,8 @@ class window.InvoiceForm extends Backbone.View
       number : @$("input[name='number']").val(), 
       buyer_info : @$("textarea[name='buyer_info']").val(), 
       seller_info : @$("textarea[name='seller_info']").val()
-    }
+    }    
+    
     if @model.isNew()
       invoices.create(data)
     else
@@ -114,8 +132,13 @@ class window.InvoiceForm extends Backbone.View
     window.location.hash = "#"
     
   newRow: (e) ->
-    view = new LineItemView({model: new LineItem})
+    item = new LineItem
+    line_items = @model.get('line_items')
+    line_items.push(item)
+    @model.set({line_items: line_items})
+    view = new LineItemView({model: item})
     @$('.line-items').append(view.render().el)
+    e.preventDefault()
 
     
       
@@ -139,6 +162,8 @@ class window.LineItemView extends Backbone.View
   removeRow: (e) ->
     $(@.el).fadeOut 'slow', ->
       $(@el).remove()   
+    e.preventDefault()
+
   
   fieldChanged: (e) ->
     field = $(e.currentTarget);
@@ -174,8 +199,8 @@ class window.App extends Backbone.Router
   
   newInvoice: -> 
     @clearMenuActiveClass()
-    @newInvoiceForm = new InvoiceForm({model: new Invoice})  
-    @newInvoiceForm.render()
+    newInvoiceForm = new InvoiceForm({model: new Invoice})  
+    newInvoiceForm.render()
     $('#new-invoice-menu-item').addClass 'active'
   
   edit: (id) ->

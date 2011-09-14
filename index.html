@@ -48,12 +48,14 @@
     <script type="text/template" id='invoice-list-template'>
       <% if(collection.models.length > 0) { %>
           <table>
+          <thead>
             <tr>
               <th>Number</th>
               <th>Date</th>
               <th>Total Price</th>
               <th colspan="2">Actions</th>
             </tr>
+          </thead>  
           <% collection.each(function(item) { %>
             <tr>
               <td><%= item.get('number') %></td>
@@ -71,7 +73,7 @@
     </script>
     
     <script type="text/template" id='invoice-form-template'>
-      <form>
+      <form action="#">
        <div class="clearfix">
          <label>Date</label>
          <div class="input"><input type="text" value="<%= model.formattedDate() %>" name="date" /></div>
@@ -81,6 +83,8 @@
           <label>Number</label>
           <div class="input"><input type="text" value="<%= model.get('number') %>" name="number" /></div>
        </div>
+       
+       
       
        <div>
           <label>Buyer details</label>
@@ -111,9 +115,11 @@
        </thead>  
        <tbody class="line-items"></tbody>
        </table>
-       <button class="btn new-line-item">New row</button>
+       <div class="well">
+         <button class="btn new-line-item">New row</button>
        
-       <button class="btn primary save-invoice">Save</button>
+         <button class="btn primary save-invoice">Save</button>
+        </div> 
       </form>
     </script>
     
