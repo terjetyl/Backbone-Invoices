@@ -42,5 +42,16 @@ h2#header {
   padding: 20px;
 }
 
+.items .quantity input {
+  width: 25px;
+}
+
+.items .price input {
+  width: 50px;
+}
+
+.items .tax-rate select {
+  width: 50px;
+}
 
 

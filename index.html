@@ -95,10 +95,12 @@
        <table class="items">
        <thead>
         <tr>
-          <th class="quantity_th">Quantity</th>
-          <th class="price_th">Price</th>   
-          <th class="tax_th">Tax</th>     
-          <th class="description_th">Price</th>        
+          <th>Quantity</th>
+          <th>Price</th>   
+          <th>Tax</th>     
+          <th>Price</th>
+          <th>Total</th>
+          <td>#</td>        
         </tr>
        </thead>  
        <tbody class="line-items"></tbody>
@@ -111,15 +113,15 @@
     
     <script type="text/template" id='line-item-template'>
 
-      <td>         
+      <td class="quantity">         
         <input type="text" value="<%= model.get('quantity') %>" name="quantity" />
       </td>
        
-      <td>
+      <td class="price">
         <input type="text" value="<%= model.get('price') %>" name="price" />
       </td>
        
-      <td>
+      <td class="tax-rate">
         <select name="tax_rate">
           <%= model.getTaxRatesOptionTag() %>                    
         </select>
@@ -132,7 +134,7 @@
         <%= model.getTotalPrice() %>
       </td>
       <td>
-        <button class="remove-line-item">(X)</button>      
+        <button class="btn danger remove-line-item">(X)</button>      
       </td>
         
         
