@@ -139,7 +139,12 @@ class window.InvoiceForm extends Backbone.View
     @
 
   handleSubmit: (e) ->
-        
+    
+    if @model.get('line_items')
+      collection = @model.get('line_items')
+    else 
+      collection = @model.line_items
+    
     data = { 
       date : @$("input[name='date']").val(), 
       number : @$("input[name='number']").val(), 
@@ -159,7 +164,7 @@ class window.InvoiceForm extends Backbone.View
     item = new LineItem
     @model.line_items.add(item)
     view = new LineItemView({model: item})
-    console.log(@model)
+    
     @$('.line-items').append(view.render().el)
     e.preventDefault()
 

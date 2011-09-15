@@ -190,7 +190,12 @@
       return this;
     };
     InvoiceForm.prototype.handleSubmit = function(e) {
-      var data;
+      var collection, data;
+      if (this.model.get('line_items')) {
+        collection = this.model.get('line_items');
+      } else {
+        collection = this.model.line_items;
+      }
       data = {
         date: this.$("input[name='date']").val(),
         number: this.$("input[name='number']").val(),
@@ -214,7 +219,6 @@
       view = new LineItemView({
         model: item
       });
-      console.log(this.model);
       this.$('.line-items').append(view.render().el);
       return e.preventDefault();
     };
