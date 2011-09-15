@@ -118,7 +118,7 @@ class window.InvoiceForm extends Backbone.View
   initialize: ->
     _.bindAll(@, 'render')    
     @template = _.template($('#invoice-form-template').html())    
-    
+    @model.line_items = new LineItems(@model.get('line_items')) if not @model.isNew()    
     
   render: ->
     rendered_content = @template({model: @model})  
@@ -138,20 +138,15 @@ class window.InvoiceForm extends Backbone.View
       @$('.line-items').append view.render().el    
     @
 
-  handleSubmit: (e) ->
-    
-    if @model.get('line_items')
-      collection = @model.get('line_items')
-    else 
-      collection = @model.line_items
-    
+  handleSubmit: (e) ->        
     data = { 
       date : @$("input[name='date']").val(), 
       number : @$("input[name='number']").val(), 
       buyer_info : @$("textarea[name='buyer_info']").val(), 
       seller_info : @$("textarea[name='seller_info']").val(),
-      line_items: collection.toJSON()
+      line_items: @model.line_items.toJSON()
     }    
+
     if @model.isNew()
       invoices.create(data)
     else

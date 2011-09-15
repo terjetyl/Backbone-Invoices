@@ -165,7 +165,10 @@
     };
     InvoiceForm.prototype.initialize = function() {
       _.bindAll(this, 'render');
-      return this.template = _.template($('#invoice-form-template').html());
+      this.template = _.template($('#invoice-form-template').html());
+      if (!this.model.isNew()) {
+        return this.model.line_items = new LineItems(this.model.get('line_items'));
+      }
     };
     InvoiceForm.prototype.render = function() {
       var collection, i, item, rendered_content, view, _i, _len;
@@ -190,18 +193,13 @@
       return this;
     };
     InvoiceForm.prototype.handleSubmit = function(e) {
-      var collection, data;
-      if (this.model.get('line_items')) {
-        collection = this.model.get('line_items');
-      } else {
-        collection = this.model.line_items;
-      }
+      var data;
       data = {
         date: this.$("input[name='date']").val(),
         number: this.$("input[name='number']").val(),
         buyer_info: this.$("textarea[name='buyer_info']").val(),
         seller_info: this.$("textarea[name='seller_info']").val(),
-        line_items: collection.toJSON()
+        line_items: this.model.line_items.toJSON()
       };
       if (this.model.isNew()) {
         invoices.create(data);
