@@ -44,7 +44,7 @@ class window.LineItems extends Backbone.Collection
 class window.Invoice extends Backbone.Model
     
   initialize: ->
-    @line_items = new LineItems
+    @line_items = new LineItems(@get('line_items'))
     
   defaults:
     date: new Date
@@ -61,6 +61,13 @@ class window.Invoice extends Backbone.Model
   
   formattedDate: ->
     $.format.date(@get('date').toString(), 'dd/MM/yyyy')
+  
+  toJson: ->
+    json = {invoice : @attributes};
+    _.extend(json, {line_items: @get("line_items").toJSON()})
+
+  
+
 
   numberFormat: (number, decimals, dec_point, thousands_sep) ->
     n = (if not isFinite(+number) then 0 else +number)
@@ -116,7 +123,6 @@ class window.InvoiceForm extends Backbone.View
   initialize: ->
     _.bindAll(@, 'render')    
     @template = _.template($('#invoice-form-template').html())    
-    @model.line_items = new LineItems(@model.get('line_items')) if not @model.isNew()    
     
   render: ->
     rendered_content = @template({model: @model})  
@@ -124,10 +130,8 @@ class window.InvoiceForm extends Backbone.View
          
     $('#app-container').html($(@.el))    
     
-    if @model.get('line_items')
-      collection = @model.get('line_items')
-    else 
-      collection = @model.line_items
+    collection = @model.get('line_items') ? @model.get('line_items') || @model.line_items
+    
     
     for item in collection
       i = new LineItem(item)
@@ -148,6 +152,7 @@ class window.InvoiceForm extends Backbone.View
       invoices.create(data)
     else
       @model.save(data)
+  
     e.preventDefault()
     e.stopPropagation()    
     $(@el).fadeOut 'fast', ->

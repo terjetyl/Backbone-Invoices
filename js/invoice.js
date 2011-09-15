@@ -78,7 +78,7 @@
       Invoice.__super__.constructor.apply(this, arguments);
     }
     Invoice.prototype.initialize = function() {
-      return this.line_items = new LineItems;
+      return this.line_items = new LineItems(this.get('line_items'));
     };
     Invoice.prototype.defaults = {
       date: new Date,
@@ -99,6 +99,15 @@
     };
     Invoice.prototype.formattedDate = function() {
       return $.format.date(this.get('date').toString(), 'dd/MM/yyyy');
+    };
+    Invoice.prototype.toJson = function() {
+      var json;
+      json = {
+        invoice: this.attributes
+      };
+      return _.extend(json, {
+        line_items: this.get("line_items").toJSON()
+      });
     };
     Invoice.prototype.numberFormat = function(number, decimals, dec_point, thousands_sep) {
       var dec, n, prec, s, sep, toFixedFix;
@@ -165,23 +174,16 @@
     };
     InvoiceForm.prototype.initialize = function() {
       _.bindAll(this, 'render');
-      this.template = _.template($('#invoice-form-template').html());
-      if (!this.model.isNew()) {
-        return this.model.line_items = new LineItems(this.model.get('line_items'));
-      }
+      return this.template = _.template($('#invoice-form-template').html());
     };
     InvoiceForm.prototype.render = function() {
-      var collection, i, item, rendered_content, view, _i, _len;
+      var collection, i, item, rendered_content, view, _i, _len, _ref;
       rendered_content = this.template({
         model: this.model
       });
       $(this.el).html(rendered_content);
       $('#app-container').html($(this.el));
-      if (this.model.get('line_items')) {
-        collection = this.model.get('line_items');
-      } else {
-        collection = this.model.line_items;
-      }
+      collection = ((_ref = this.model.get('line_items')) != null ? _ref : this.model.get('line_items')) || this.model.line_items;
       for (_i = 0, _len = collection.length; _i < _len; _i++) {
         item = collection[_i];
         i = new LineItem(item);
