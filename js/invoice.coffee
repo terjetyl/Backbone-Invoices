@@ -1,3 +1,14 @@
+_.extend Backbone.Model::, deepToJSON: ->
+  obj = @toJSON()
+  _.each _.keys(obj), (key) ->
+    obj[key] = obj[key].deepToJSON()  if _.isFunction(obj[key].deepToJSON)
+  
+  obj
+
+_.extend Backbone.Collection::, deepToJSON: ->
+  @map (model) ->
+    model.deepToJSON()
+
 # ------------------------------------------------------
 # Models
 # ------------------------------------------------------
@@ -28,21 +39,26 @@ class window.LineItem extends Backbone.Model
     description: null
     tax_rate: 0
 
+class window.LineItems extends Backbone.Collection
+  model: LineItem
+
+
 class window.Invoice extends Backbone.Model
     
   initialize: ->
-  
+    @line_items = new LineItems
+    
   defaults:
     date: new Date
     number: '000001'
     seller_info: null
     buyer_info: null  
-    line_items: [new LineItem]
   
   getTotalPrice: ->
     total = 0
     for item in @get('line_items')
-      total += item.getTotalPrice()
+      i = new LineItem(item)
+      total += i.getTotalPrice()
     @numberFormat(total, 2)  
   
   formattedDate: ->
@@ -110,19 +126,27 @@ class window.InvoiceForm extends Backbone.View
    
       
     $('#app-container').html($(@.el))    
-    for item in @model.get('line_items')
-      view = new LineItemView({model: new LineItem})
+    
+    if @model.get('line_items')
+      collection = @model.get('line_items')
+    else 
+      collection = @model.line_items
+    
+    for item in collection
+      i = new LineItem(item)
+      view = new LineItemView({model: i})
       @$('.line-items').append view.render().el    
     @
 
   handleSubmit: (e) ->
+        
     data = { 
       date : @$("input[name='date']").val(), 
       number : @$("input[name='number']").val(), 
       buyer_info : @$("textarea[name='buyer_info']").val(), 
-      seller_info : @$("textarea[name='seller_info']").val()
+      seller_info : @$("textarea[name='seller_info']").val(),
+      line_items: collection.toJSON()
     }    
-    
     if @model.isNew()
       invoices.create(data)
     else
@@ -133,10 +157,9 @@ class window.InvoiceForm extends Backbone.View
     
   newRow: (e) ->
     item = new LineItem
-    line_items = @model.get('line_items')
-    line_items.push(item)
-    @model.set({line_items: line_items})
+    @model.line_items.add(item)
     view = new LineItemView({model: item})
+    console.log(@model)
     @$('.line-items').append(view.render().el)
     e.preventDefault()
 

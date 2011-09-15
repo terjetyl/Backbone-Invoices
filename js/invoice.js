@@ -7,6 +7,25 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  _.extend(Backbone.Model.prototype, {
+    deepToJSON: function() {
+      var obj;
+      obj = this.toJSON();
+      _.each(_.keys(obj), function(key) {
+        if (_.isFunction(obj[key].deepToJSON)) {
+          return obj[key] = obj[key].deepToJSON();
+        }
+      });
+      return obj;
+    }
+  });
+  _.extend(Backbone.Collection.prototype, {
+    deepToJSON: function() {
+      return this.map(function(model) {
+        return model.deepToJSON();
+      });
+    }
+  });
   window.LineItem = (function() {
     __extends(LineItem, Backbone.Model);
     function LineItem() {
@@ -45,26 +64,36 @@
     };
     return LineItem;
   })();
+  window.LineItems = (function() {
+    __extends(LineItems, Backbone.Collection);
+    function LineItems() {
+      LineItems.__super__.constructor.apply(this, arguments);
+    }
+    LineItems.prototype.model = LineItem;
+    return LineItems;
+  })();
   window.Invoice = (function() {
     __extends(Invoice, Backbone.Model);
     function Invoice() {
       Invoice.__super__.constructor.apply(this, arguments);
     }
-    Invoice.prototype.initialize = function() {};
+    Invoice.prototype.initialize = function() {
+      return this.line_items = new LineItems;
+    };
     Invoice.prototype.defaults = {
       date: new Date,
       number: '000001',
       seller_info: null,
-      buyer_info: null,
-      line_items: [new LineItem]
+      buyer_info: null
     };
     Invoice.prototype.getTotalPrice = function() {
-      var item, total, _i, _len, _ref;
+      var i, item, total, _i, _len, _ref;
       total = 0;
       _ref = this.get('line_items');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         item = _ref[_i];
-        total += item.getTotalPrice();
+        i = new LineItem(item);
+        total += i.getTotalPrice();
       }
       return this.numberFormat(total, 2);
     };
@@ -139,17 +168,22 @@
       return this.template = _.template($('#invoice-form-template').html());
     };
     InvoiceForm.prototype.render = function() {
-      var item, rendered_content, view, _i, _len, _ref;
+      var collection, i, item, rendered_content, view, _i, _len;
       rendered_content = this.template({
         model: this.model
       });
       $(this.el).html(rendered_content);
       $('#app-container').html($(this.el));
-      _ref = this.model.get('line_items');
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        item = _ref[_i];
+      if (this.model.get('line_items')) {
+        collection = this.model.get('line_items');
+      } else {
+        collection = this.model.line_items;
+      }
+      for (_i = 0, _len = collection.length; _i < _len; _i++) {
+        item = collection[_i];
+        i = new LineItem(item);
         view = new LineItemView({
-          model: new LineItem
+          model: i
         });
         this.$('.line-items').append(view.render().el);
       }
@@ -161,7 +195,8 @@
         date: this.$("input[name='date']").val(),
         number: this.$("input[name='number']").val(),
         buyer_info: this.$("textarea[name='buyer_info']").val(),
-        seller_info: this.$("textarea[name='seller_info']").val()
+        seller_info: this.$("textarea[name='seller_info']").val(),
+        line_items: collection.toJSON()
       };
       if (this.model.isNew()) {
         invoices.create(data);
@@ -173,16 +208,13 @@
       return window.location.hash = "#";
     };
     InvoiceForm.prototype.newRow = function(e) {
-      var item, line_items, view;
+      var item, view;
       item = new LineItem;
-      line_items = this.model.get('line_items');
-      line_items.push(item);
-      this.model.set({
-        line_items: line_items
-      });
+      this.model.line_items.add(item);
       view = new LineItemView({
         model: item
       });
+      console.log(this.model);
       this.$('.line-items').append(view.render().el);
       return e.preventDefault();
     };
