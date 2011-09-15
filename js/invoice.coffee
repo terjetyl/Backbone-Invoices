@@ -23,9 +23,7 @@ class window.LineItem extends Backbone.Model
   initialize: ->
     @tax_rates_option_tag = ""    
     @tax_rates_option_tag += '<option value="' + rate + '">' + name + '</option>' for rate, name of @tax_rates     
-  
-
-  
+    
   getTaxRatesOptionTag: ->
     @tax_rates_option_tag
   
@@ -123,8 +121,7 @@ class window.InvoiceForm extends Backbone.View
   render: ->
     rendered_content = @template({model: @model})  
     $(@.el).html rendered_content
-   
-      
+         
     $('#app-container').html($(@.el))    
     
     if @model.get('line_items')
@@ -153,7 +150,8 @@ class window.InvoiceForm extends Backbone.View
       @model.save(data)
     e.preventDefault()
     e.stopPropagation()    
-    window.location.hash = "#"
+    $(@el).fadeOut 'fast', ->
+      window.location.hash = "#"
     
   newRow: (e) ->
     item = new LineItem
@@ -222,14 +220,14 @@ class window.App extends Backbone.Router
   
   newInvoice: -> 
     @clearMenuActiveClass()
-    newInvoiceForm = new InvoiceForm({model: new Invoice})  
-    newInvoiceForm.render()
+    @newInvoiceForm = new InvoiceForm({model: new Invoice})  
+    @newInvoiceForm.render()
     $('#new-invoice-menu-item').addClass 'active'
   
   edit: (id) ->
     inv = invoices.getByCid(id)
-    @newInvoiceForm = new InvoiceForm({model: inv})
-    @newInvoiceForm.render()
+    @editInvoiceForm = new InvoiceForm({model: inv})
+    @editInvoiceForm.render()
   
   clearMenuActiveClass: ->
     $(li).removeClass('active') for li in $('#navigation ul li')

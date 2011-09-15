@@ -208,7 +208,9 @@
       }
       e.preventDefault();
       e.stopPropagation();
-      return window.location.hash = "#";
+      return $(this.el).fadeOut('fast', function() {
+        return window.location.hash = "#";
+      });
     };
     InvoiceForm.prototype.newRow = function(e) {
       var item, view;
@@ -290,21 +292,20 @@
       return $('#list-invoices-menu-item').addClass('active');
     };
     App.prototype.newInvoice = function() {
-      var newInvoiceForm;
       this.clearMenuActiveClass();
-      newInvoiceForm = new InvoiceForm({
+      this.newInvoiceForm = new InvoiceForm({
         model: new Invoice
       });
-      newInvoiceForm.render();
+      this.newInvoiceForm.render();
       return $('#new-invoice-menu-item').addClass('active');
     };
     App.prototype.edit = function(id) {
       var inv;
       inv = invoices.getByCid(id);
-      this.newInvoiceForm = new InvoiceForm({
+      this.editInvoiceForm = new InvoiceForm({
         model: inv
       });
-      return this.newInvoiceForm.render();
+      return this.editInvoiceForm.render();
     };
     App.prototype.clearMenuActiveClass = function() {
       var li, _i, _len, _ref, _results;
