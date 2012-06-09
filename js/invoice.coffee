@@ -16,9 +16,9 @@ _.extend Backbone.Collection::, deepToJSON: ->
 class window.LineItem extends Backbone.Model
   tax_rates:
     0: "0%"
-    0.19: "19%"
-    0.22: "22%"
-    0.23: "23%"
+    0.08: "8%"
+    0.15: "15%"
+    0.25: "25%"
       
   initialize: ->
     @tax_rates_option_tag = ""    
@@ -29,13 +29,16 @@ class window.LineItem extends Backbone.Model
   
   getTotalPrice: ->
     total_price = @get('price') * @get('quantity')
-    total_price + total_price * @get('tax_rate')
+    total_price = total_price * (@get('tax_rate') + 1)
+    total_price
         
   defaults:
     quantity: 1
     price: 100.00
     description: null
     tax_rate: 0
+    discount: 0
+
 
 class window.LineItems extends Backbone.Collection
   model: LineItem
@@ -44,20 +47,19 @@ class window.LineItems extends Backbone.Collection
 class window.Invoice extends Backbone.Model
     
   initialize: ->
-    @line_items = new LineItems(@get('line_items'))
+    @line_items = new LineItems
+    @line_items.add new LineItem
     
   defaults:
     date: new Date
     number: '000001'
     seller_info: null
-    buyer_info: null  
-  
+    buyer_info: null
+    
   getTotalPrice: ->
-    total = 0
-    for item in @get('line_items')
-      i = new LineItem(item)
-      total += i.getTotalPrice()
-    @numberFormat(total, 2)  
+    @line_items.reduce (memo, value) ->
+    	memo + value.getTotalPrice()
+    ,0
   
   formattedDate: ->
     $.format.date(@get('date').toString(), 'dd/MM/yyyy')
@@ -66,10 +68,7 @@ class window.Invoice extends Backbone.Model
     json = {invoice : @attributes};
     _.extend(json, {line_items: @get("line_items").toJSON()})
 
-  
-
-
-  numberFormat: (number, decimals, dec_point, thousands_sep) ->
+  @numberFormat: (number, decimals, dec_point, thousands_sep) ->
     n = (if not isFinite(+number) then 0 else +number)
     prec = (if not isFinite(+decimals) then 0 else Math.abs(decimals))
     sep = (if (typeof thousands_sep == "undefined") then "." else thousands_sep)

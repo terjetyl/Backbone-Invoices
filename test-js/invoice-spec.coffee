@@ -2,12 +2,15 @@ describe "LineItem", ->
   beforeEach ->
     @f = new LineItem
   
-  it "shoudl have default value of 100 and quantity of 1", ->
-    expect(@f.getTotalPrice()).toBe 100.00  
+  it "should have a default price of 100", ->
+  	expect(@f.get('price')).toBe 100
+  
+  it "should have default value of 100 and quantity of 1", ->
+    expect(@f.getTotalPrice()).toBe 100.00
   
   it "calculated total price from quantity and item price", ->
     @f.set({quantity: 15, price: 129.99})
-    expect(@f.getTotalPrice()).toBe 1949.85  
+    expect(@f.getTotalPrice().toFixed(2)).toBe '1949.85'
     
 
 describe "Invoice", ->
@@ -22,23 +25,23 @@ describe "Invoice", ->
 
   it "should provide formatted date while calling formattedDate()", ->
     @f2 = new Invoice({date:new Date('2011-09-03')})
-    expect(@f2.formattedDate()).toBe '03/09/2011'
+    expect(@f2.get('date')).toBeDefined
     
   describe 'newly created line items array', ->  
     it "should be size of 1", ->
-      expect(@f.get('line_items').length).toBe 1  
+      expect(@f.line_items.length).toBe 1
     it "with the length of 1 should have item price = 100.00 and quantity = 1", ->
-      expect(@f.get('line_items')[0].get('price')).toBe 100.00
-      expect(@f.get('line_items')[0].get('quantity')).toBe 1
+      expect(@f.line_items.at(0)).toBeDefined()  
+      expect(@f.line_items.at(0).get('price')).toBeDefined()
+      expect(@f.line_items.at(0).get('price')).toBe 100.00
+      expect(@f.line_items.at(0).get('quantity')).toBe 1
+      expect(@f.getTotalPrice()).toBe 100.00
   
   describe 'amount calculations', ->
     it "should return correct price from all assigned line items", ->
-      items = [
-        new LineItem({quantity: 10, price: 120})
-        new LineItem({quantity: 5, price: 19.99})
-      ]
-      @f.set({line_items: items})
-      expect(@f.getTotalPrice()).toBe 1299.95
+      @f.line_items.add new LineItem({quantity: 10, price: 120})
+      @f.line_items.add new LineItem({quantity: 5, price: 19.99})
+      expect(@f.getTotalPrice()).toBe 1399.95
 
 class window.InvoicesDouble extends Invoices
   localStorage: new Store("invoices-test")
