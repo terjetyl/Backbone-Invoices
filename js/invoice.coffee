@@ -45,19 +45,18 @@ class window.LineItems extends Backbone.Collection
 
 
 class window.Invoice extends Backbone.Model
-    
+
   initialize: ->
-    @line_items = new LineItems
-    @line_items.add new LineItem
-    
+
   defaults:
     date: new Date
     number: '000001'
     seller_info: null
     buyer_info: null
+    line_items: new LineItems
     
   getTotalPrice: ->
-    @line_items.reduce (memo, value) ->
+    @get('line_items').reduce (memo, value) ->
     	memo + value.getTotalPrice()
     ,0
   
@@ -86,10 +85,32 @@ class window.Invoice extends Backbone.Model
     s.join dec
 
 # ------------------------------------------------------
-# Collections
+# Knockback viewModels
 # ------------------------------------------------------
 
+class window.LineItemViewModel extends kb.ViewModel
+  constructor: (model) ->
+    super(model)  # call super constructor: @name, @_email, and @_date created in super from the model attributes
+    @total = ko.computed =>
+    	@price() * @quantity()
+    @deleteRow = => model.destroy()
+    	
+class window.InvoiceViewModel extends kb.ViewModel
+  constructor: (model) ->
+    super(model)  # call super constructor: @name, @_email, and @_date created in super from the model attributes
+    @formatted_name = kb.formattedObservable("{0}...cool!", @number())
+    @lines = kb.collectionObservable(model.get('line_items'), { view_model: LineItemViewModel })
+    @total = ko.computed =>
+    	total = 0
+    	total += line.total() for line in @lines()
+    	total
+    @addRow = -> 
+    	model.get('line_items').add new LineItem
+    		
 
+# ------------------------------------------------------
+# Collections
+# ------------------------------------------------------
 
 class window.Invoices extends Backbone.Collection
   model: Invoice 
@@ -202,7 +223,7 @@ class window.LineItemView extends Backbone.View
     data = {}
     data[field.attr('name')] = value
     @model.set(data)
-
+    
 
 # ------------------------------------------------------
 # Routers

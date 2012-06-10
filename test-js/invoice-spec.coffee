@@ -15,7 +15,7 @@ describe "LineItem", ->
 
 describe "Invoice", ->
   beforeEach ->
-    @f = new Invoice
+    @f = new Invoice({line_items: new LineItems(new LineItem)})
   
   it "sets the date to current date for newly created", ->
     d = new Date
@@ -29,19 +29,38 @@ describe "Invoice", ->
     
   describe 'newly created line items array', ->  
     it "should be size of 1", ->
-      expect(@f.line_items.length).toBe 1
+      expect(@f.get('line_items').length).toBe 1
     it "with the length of 1 should have item price = 100.00 and quantity = 1", ->
-      expect(@f.line_items.at(0)).toBeDefined()  
-      expect(@f.line_items.at(0).get('price')).toBeDefined()
-      expect(@f.line_items.at(0).get('price')).toBe 100.00
-      expect(@f.line_items.at(0).get('quantity')).toBe 1
+      expect(@f.get('line_items').at(0)).toBeDefined()  
+      expect(@f.get('line_items').at(0).get('price')).toBeDefined()
+      expect(@f.get('line_items').at(0).get('price')).toBe 100.00
+      expect(@f.get('line_items').at(0).get('quantity')).toBe 1
       expect(@f.getTotalPrice()).toBe 100.00
   
   describe 'amount calculations', ->
     it "should return correct price from all assigned line items", ->
-      @f.line_items.add new LineItem({quantity: 10, price: 120})
-      @f.line_items.add new LineItem({quantity: 5, price: 19.99})
+      @f.get('line_items').add new LineItem({quantity: 10, price: 120})
+      @f.get('line_items').add new LineItem({quantity: 5, price: 19.99})
       expect(@f.getTotalPrice()).toBe 1399.95
+      
+describe "LineItemViewModel", ->
+  beforeEach ->
+    @f = new LineItemViewModel(new LineItem)
+    
+  it "should have a total of 100", ->
+  	expect(@f.quantity()).toBe 1
+  	expect(@f.price()).toBe 100
+  	expect(@f.total()).toBe 100
+
+describe "InvoiceViewModel", ->
+  beforeEach ->
+    @f = new InvoiceViewModel(new Invoice({line_items: new LineItems(new LineItem)}))
+    console.log @f.formatted_name()
+    console.log line for line in  @f.line_items()
+    console.log line for line in @f.lines()
+    
+  it "should have a total of 100", ->
+  	expect(@f.number()).toBe '000001'
 
 class window.InvoicesDouble extends Invoices
   localStorage: new Store("invoices-test")

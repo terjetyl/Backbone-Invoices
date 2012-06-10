@@ -1,0 +1,124 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+  <html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Knockback demo</title>
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+    <link rel="stylesheet" href="https://raw.github.com/twitter/bootstrap/master/docs/assets/css/bootstrap.css">
+
+    <!-- include source files here... -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.date_format.js"></script>
+    <script type="text/javascript" src="js/json2.js"></script>
+    
+    <script type="text/javascript" src="js/underscore.js"></script>
+    <script type="text/javascript" src="js/backbone.js"></script>
+    <script type="text/javascript" src="js/backbone.localstorage.js"></script>
+    
+    <script type="text/javascript" src="http://cloud.github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.js"></script>
+    <script type="text/javascript" src="http://cloud.github.com/downloads/kmalakoff/knockback/knockback-0.15.3.js"></script>
+    
+    <script type="text/javascript" src="js/invoice.js"></script>
+
+
+  </head>
+  <body>
+  
+  	<fieldset>
+  		<legend>Invoice</legend>
+  		
+	  	<div>
+	    	FakturaNr: <span data-bind="text: number"></span>
+	    </div>
+	    <div>
+	    	Dato: <span data-bind="text: date"></span>
+	    </div>
+	    <div>
+	    	Seller: <span data-bind="text: seller_info"></span>
+	    </div>
+	    <div>
+	    	Buyer: <span data-bind="text: buyer_info"></span>
+	    </div>
+	    
+  	</fieldset>
+  
+  	<div id="r-formset-wrapper">
+        <table id="r-formset">
+        <thead class="top">
+            <tr>
+                <th class="tool"></th>
+                <th class="first quantity">&nbsp;Quantity</th>
+                <th class="price">Price</th>
+                <th class="description">Description</th>
+                <th class="tax">M %</th>
+                <th class="discount">R %</th>
+                <th class="last total">Total</th>
+            </tr>
+        </thead>
+        <tbody data-bind="foreach: lines">
+            	
+            <tr class="irow" id="irow-0">
+				<td class="tool">
+				    <img src="css/cross.png" data-bind="click: deleteRow" width="16" height="16" />
+				</td>
+			    <td class="quantity">
+			        <input type="text" data-bind="value: quantity" />
+			    </td>
+			    <td class="price"><input type="text" data-bind="value: price" /></td>
+			    <td class="description"><input type="text" data-bind="value: description" /></td>
+			    <td class="tax"><input type="text" data-bind="value: tax_rate" /></td>
+			    <td class="discount"><input type="text" data-bind="value: discount" /></td>
+			    <td class="total row-total" data-bind="text: total"></td>
+				
+			</tr>        
+			
+	    </tbody>
+        </table>
+        <table id="totals" border="1">
+            <tbody><tr>
+                <td rowspan="7" class="invoice-form-tools">
+                    <div id="tools">
+                        <input type="button" data-bind="click: addRow" value="New row">
+                    </div>
+                </td>
+                <th></th>
+                <td class="sums"></td>
+            </tr>
+            <tr id="discount-total-row" class="hidden" style="display: none; ">
+                <th>
+                    Discount <span id="discount"></span>
+                </th>
+                <td class="sums special-error-placement" id="discount-result">0,00 kr</td>
+            </tr>
+            <tr>
+                <th>
+                    Total ex. vat
+                </th>
+                <td class="sums" id="grand-total-exc-tax">0,00 kr</td>
+            </tr>
+            <tr>
+                <th>
+                    Vat <span id="tax">25%</span>
+                </th>
+                <td class="sums special-error-placement" id="tax-result">0,00 kr</td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td id="grand-total-inc-tax" class="sums" data-bind="text: total"></td>
+            </tr>
+        </tbody></table>
+    </div>
+    
+    
+    
+    <script type="text/javascript">
+
+    	var viewmodel = new InvoiceViewModel(new Invoice({line_items: new LineItems(new LineItem)}));
+	     
+    	ko.applyBindings(viewmodel);
+
+    </script>
+    
+  </body>
+  </html>

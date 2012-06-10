@@ -96,20 +96,18 @@
       return Invoice.__super__.constructor.apply(this, arguments);
     }
 
-    Invoice.prototype.initialize = function() {
-      this.line_items = new LineItems;
-      return this.line_items.add(new LineItem);
-    };
+    Invoice.prototype.initialize = function() {};
 
     Invoice.prototype.defaults = {
       date: new Date,
       number: '000001',
       seller_info: null,
-      buyer_info: null
+      buyer_info: null,
+      line_items: new LineItems
     };
 
     Invoice.prototype.getTotalPrice = function() {
-      return this.line_items.reduce(function(memo, value) {
+      return this.get('line_items').reduce(function(memo, value) {
         return memo + value.getTotalPrice();
       }, 0);
     };
@@ -154,6 +152,55 @@
     return Invoice;
 
   })(Backbone.Model);
+
+  window.LineItemViewModel = (function(_super) {
+
+    __extends(LineItemViewModel, _super);
+
+    function LineItemViewModel(model) {
+      var _this = this;
+      LineItemViewModel.__super__.constructor.call(this, model);
+      this.total = ko.computed(function() {
+        return _this.price() * _this.quantity();
+      });
+      this.deleteRow = function() {
+        return model.destroy();
+      };
+    }
+
+    return LineItemViewModel;
+
+  })(kb.ViewModel);
+
+  window.InvoiceViewModel = (function(_super) {
+
+    __extends(InvoiceViewModel, _super);
+
+    function InvoiceViewModel(model) {
+      var _this = this;
+      InvoiceViewModel.__super__.constructor.call(this, model);
+      this.formatted_name = kb.formattedObservable("{0}...cool!", this.number());
+      this.lines = kb.collectionObservable(model.get('line_items'), {
+        view_model: LineItemViewModel
+      });
+      this.total = ko.computed(function() {
+        var line, total, _i, _len, _ref;
+        total = 0;
+        _ref = _this.lines();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          line = _ref[_i];
+          total += line.total();
+        }
+        return total;
+      });
+      this.addRow = function() {
+        return model.get('line_items').add(new LineItem);
+      };
+    }
+
+    return InvoiceViewModel;
+
+  })(kb.ViewModel);
 
   window.Invoices = (function(_super) {
 

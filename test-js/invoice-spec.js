@@ -25,7 +25,9 @@
 
   describe("Invoice", function() {
     beforeEach(function() {
-      return this.f = new Invoice;
+      return this.f = new Invoice({
+        line_items: new LineItems(new LineItem)
+      });
     });
     it("sets the date to current date for newly created", function() {
       var d;
@@ -42,28 +44,64 @@
     });
     describe('newly created line items array', function() {
       it("should be size of 1", function() {
-        return expect(this.f.line_items.length).toBe(1);
+        return expect(this.f.get('line_items').length).toBe(1);
       });
       return it("with the length of 1 should have item price = 100.00 and quantity = 1", function() {
-        expect(this.f.line_items.at(0)).toBeDefined();
-        expect(this.f.line_items.at(0).get('price')).toBeDefined();
-        expect(this.f.line_items.at(0).get('price')).toBe(100.00);
-        expect(this.f.line_items.at(0).get('quantity')).toBe(1);
+        expect(this.f.get('line_items').at(0)).toBeDefined();
+        expect(this.f.get('line_items').at(0).get('price')).toBeDefined();
+        expect(this.f.get('line_items').at(0).get('price')).toBe(100.00);
+        expect(this.f.get('line_items').at(0).get('quantity')).toBe(1);
         return expect(this.f.getTotalPrice()).toBe(100.00);
       });
     });
     return describe('amount calculations', function() {
       return it("should return correct price from all assigned line items", function() {
-        this.f.line_items.add(new LineItem({
+        this.f.get('line_items').add(new LineItem({
           quantity: 10,
           price: 120
         }));
-        this.f.line_items.add(new LineItem({
+        this.f.get('line_items').add(new LineItem({
           quantity: 5,
           price: 19.99
         }));
         return expect(this.f.getTotalPrice()).toBe(1399.95);
       });
+    });
+  });
+
+  describe("LineItemViewModel", function() {
+    beforeEach(function() {
+      return this.f = new LineItemViewModel(new LineItem);
+    });
+    return it("should have a total of 100", function() {
+      expect(this.f.quantity()).toBe(1);
+      expect(this.f.price()).toBe(100);
+      return expect(this.f.total()).toBe(100);
+    });
+  });
+
+  describe("InvoiceViewModel", function() {
+    beforeEach(function() {
+      var line, _i, _j, _len, _len1, _ref, _ref1, _results;
+      this.f = new InvoiceViewModel(new Invoice({
+        line_items: new LineItems(new LineItem)
+      }));
+      console.log(this.f.formatted_name());
+      _ref = this.f.line_items();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        line = _ref[_i];
+        console.log(line);
+      }
+      _ref1 = this.f.lines();
+      _results = [];
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        line = _ref1[_j];
+        _results.push(console.log(line));
+      }
+      return _results;
+    });
+    return it("should have a total of 100", function() {
+      return expect(this.f.number()).toBe('000001');
     });
   });
 
